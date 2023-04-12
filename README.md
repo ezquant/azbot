@@ -1,1 +1,1 @@
-# azbot_data
+# azbot deployment sample
