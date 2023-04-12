@@ -8,14 +8,14 @@
 [//]: [![Discord](https://img.shields.io/discord/960156400376483840?color=5865F2&label=discord)](https://discord.gg/TGCrUH972E)
 [//]: [![Discord](https://img.shields.io/badge/donate-patreon-red)](https://www.patreon.com/azbot_github)
 
-A fast stock and cryptocurrency trading bot framework implemented in Go. Azbot permits users to create and test custom strategies for sport and future markets. 
+A fast stock and cryptocurrency trading bot framework implemented in Go. Azbot permits users to create and test custom strategies for spot and future markets. 
 
-[//]: Docs: https://ezquant.github.io/azbot/
+Docs: https://ezquant.github.io/azbot/
 
 The project was greatly inspired by: https://github.com/rodrigo-brito/ninjabot
 
-|DISCLAIMER                                                                                                                                                                                                           |
-|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| DISCLAIMER |
+| ---------- |
 | This software is for educational purposes only. Do not risk money which you are afraid to lose.  USE THE SOFTWARE AT YOUR OWN RISK. THE AUTHORS AND ALL AFFILIATES ASSUME NO RESPONSIBILITY FOR YOUR TRADING RESULTS |
 
 ## Installation
@@ -104,8 +104,14 @@ Chart available at http://localhost:8080
 
 - [x] Backtesting
   - [x] Paper Wallet (Live Trading with fake wallet)
-  - [x] Load Feed from CSV
   - [x] Order Limit, Market, Stop Limit, OCO
+  - [x] Load Feed from CSV
+  - [ ] Load Feed from TDX local files
+  - [ ] Load Feed from Redis DB
+
+- [x] Paperwallet
+  - [ ] Load Feed from TDX remote API
+  - [ ] Load Feed from CTP simnow and live
 
 - [x] Bot Utilities
   - [x] CLI to download historical data
