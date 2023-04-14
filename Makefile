@@ -28,4 +28,5 @@ download:
 	@azbot download --pair BTCUSDT --timeframe 1d --days 30 --output ./btc-1d-last.csv
 
 backtest:
-	go run examples/backtesting/backtesting.go
+	@#go run examples/backtesting/backtesting.go
+	go run examples/backtest_stock/backtest_stock.go
