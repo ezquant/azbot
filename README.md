@@ -7,20 +7,26 @@
 [//]: [![GoReference](https://pkg.go.dev/badge/github.com/ezquant/azbot.svg)](https://pkg.go.dev/github.com/ezquant/azbot)
 [//]: [![Discord](https://img.shields.io/discord/960156400376483840?color=5865F2&label=discord)](https://discord.gg/TGCrUH972E)
 [//]: [![Discord](https://img.shields.io/badge/donate-patreon-red)](https://www.patreon.com/azbot_github)
+[//]: [![Docs](https://ezquant.github.io/azbot/)](https://ezquant.github.io/azbot/)
 
-A fast stock and cryptocurrency trading bot framework implemented in Go. Azbot permits users to create and test custom strategies for spot and future markets. 
-
-Docs: https://ezquant.github.io/azbot/
-
-The project was greatly inspired by: https://github.com/rodrigo-brito/ninjabot
+A fast cryptocurrency and stock trading bot framework implemented in Go. Azbot permits users to create and test custom strategies for spot and future markets.
 
 | DISCLAIMER |
 | ---------- |
-| This software is for educational purposes only. Do not risk money which you are afraid to lose.  USE THE SOFTWARE AT YOUR OWN RISK. THE AUTHORS AND ALL AFFILIATES ASSUME NO RESPONSIBILITY FOR YOUR TRADING RESULTS |
+| This software is for educational purposes only. Do not risk money which you are afraid to lose. USE THE SOFTWARE AT YOUR OWN RISK. THE AUTHORS AND ALL AFFILIATES ASSUME NO RESPONSIBILITY FOR YOUR TRADING RESULTS. |
+
+**Thanks**
+
+The project was greatly inspired by: https://github.com/rodrigo-brito/ninjabot
 
 ## Installation
 
 `go get -u github.com/ezquant/azbot/...`
+
+### CLI
+
+- Pre-build binaries in [release page](https://github.com/ezquant/azbot/releases)
+- Or with `go install github.com/ezquant/azbot/cmd/azbot@latest`
 
 ## Examples of Usage
 
@@ -30,14 +36,10 @@ Check [examples](examples) directory:
 - Backtesting (Simulation with historical data)
 - Real Account (Binance)
 
-### CLI
+**download historical data**
 
 To download historical data you can download azbot CLI from:
 
-- Pre-build binaries in [release page](https://github.com/ezquant/azbot/releases)
-- Or with `go install github.com/ezquant/azbot/cmd/azbot@latest`
-
-**Example of usage**
 ```bash
 # Download candles of BTCUSDT to btc.csv file (Last 30 days, timeframe 1D)
 azbot download --pair BTCUSDT --timeframe 1d --days 30 --output ./btc.csv
@@ -45,7 +47,7 @@ azbot download --pair BTCUSDT --timeframe 1d --days 30 --output ./btc.csv
 
 ### Backtesting Example
 
-- Backtesting a custom strategy from [examples](examples) directory:
+Backtesting a custom strategy from [examples](examples) directory:
 ```
 go run examples/backtesting/backtesting.go
 ```
@@ -84,7 +86,6 @@ ETHUSDT         = 407769.64 USDT
 TOTAL           = 855799.68 USDT
 -------------------
 Chart available at http://localhost:8080
-
 ```
 
 ### Plot result
@@ -101,6 +102,9 @@ Chart available at http://localhost:8080
 | Order Stop         	|       :ok:    | :ok:               |
 | Order OCO          	|       :ok:    | 	                 |
 | Backtesting        	|       :ok:    | :ok:         	     |
+
+
+# Roadmap
 
 - [x] Backtesting
   - [x] Paper Wallet (Live Trading with fake wallet)
@@ -121,11 +125,12 @@ Chart available at http://localhost:8080
   - [x] Trailing stop tool
   - [x] In app order scheduler
 
-# Roadmap
+- [ ] Todo
   - [ ] Include Web UI Controller
   - [ ] Include more chart indicators - [Details](https://github.com/ezquant/azbot/issues/110)
+  - [ ] Docs
 
-### Exchanges
+### New exchange
 
 Currently, we only support [Binance](https://www.binance.com/en?ref=35723227) exchange. If you want to include support for other exchanges, you need to implement a new `struct` that implements the interface `Exchange`. You can check some examples in [exchange](./pkg/exchange) directory.
 
@@ -133,16 +138,12 @@ Currently, we only support [Binance](https://www.binance.com/en?ref=35723227) ex
 
 |  | Address  |
 | --- | --- |
-|**BTC** | `bc1qpk6yqju6rkz33ntzj8kuepmynmztzydmec2zm4`|
-|**ETH** | `0x2226FFe4aBD2Afa84bf7222C2b17BBC65F64555A` |
-|**LTC** | `ltc1qj2n9r4yfsm5dnsmmtzhgj8qcj8fjpcvgkd9v3j` |
-
-**Patreon**: https://www.patreon.com/azbot_github
+|**BTC** | `3EKTNjKNCmBqUZUZMFCuzpZkx7cna4GQ4S`|
+|**ETH** | `0x0ba94169c2315635f2d66de6a53e69879b99be03` |
 
 [comment]: <> (一段注释)
 [comment]: # (一段注释)
 [//]: // (一段注释)
 [//]: 一段注释
 [^_^]: 开心注释
-[>_<]:
-  抓狂注释
+[>_<]: 抓狂注释
