@@ -7,6 +7,7 @@ import (
 	"github.com/ezquant/azbot/azbot/download"
 	"github.com/ezquant/azbot/azbot/exchange"
 	"github.com/ezquant/azbot/azbot/service"
+	"github.com/ezquant/azbot/examples/backtesting"
 
 	"github.com/urfave/cli/v2"
 )
@@ -104,6 +105,15 @@ func main() {
 					return download.NewDownloader(exc).Download(c.Context, c.String("pair"),
 						c.String("timeframe"), c.String("output"), options...)
 
+				},
+			},
+			{
+				Name:     "backtest",
+				HelpName: "backtest",
+				Usage:    "Run backtesting for a custom strategy",
+				Action: func(c *cli.Context) error {
+					// 调用 backtesting.go 中的主逻辑
+					return backtesting.RunBacktesting()
 				},
 			},
 		},

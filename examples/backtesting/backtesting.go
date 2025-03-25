@@ -1,4 +1,4 @@
-package main
+package backtesting
 
 import (
 	"context"
@@ -12,9 +12,8 @@ import (
 	"github.com/ezquant/azbot/examples/strategies"
 )
 
-// This example shows how to use backtesting with AzBot
-// Backtesting is a simulation of the strategy in historical data (from CSV)
-func main() {
+// RunBacktesting runs the backtesting logic
+func RunBacktesting() error {
 	ctx := context.Background()
 
 	// bot settings (eg: pairs, telegram, etc)
@@ -43,13 +42,13 @@ func main() {
 		},
 	)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	// initialize a database in memory
 	storage, err := storage.FromMemory()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	// create a paper wallet for simulation, initializing with 10.000 USDT
@@ -60,7 +59,7 @@ func main() {
 		exchange.WithDataFeed(csvFeed),
 	)
 
-	// create a chart  with indicators from the strategy and a custom additional RSI indicator
+	// create a chart with indicators from the strategy and a custom additional RSI indicator
 	chart, err := plot.NewChart(
 		plot.WithStrategyIndicators(strategy),
 		plot.WithCustomIndicators(
@@ -69,10 +68,10 @@ func main() {
 		plot.WithPaperWallet(wallet),
 	)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	// initializer Azbot with the objects created before
+	// initialize Azbot with the objects created before
 	bot, err := azbot.NewBot(
 		ctx,
 		settings,
@@ -87,21 +86,18 @@ func main() {
 		azbot.WithLogLevel(log.WarnLevel),
 	)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	// Initializer simulation
+	// Initialize simulation
 	err = bot.Run(ctx)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	// Print bot results
 	bot.Summary()
 
 	// Display candlesticks chart in local browser
-	err = chart.Start()
-	if err != nil {
-		log.Fatal(err)
-	}
+	return chart.Start()
 }
