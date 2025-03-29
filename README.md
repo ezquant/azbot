@@ -46,7 +46,7 @@ To download historical data you can download azbot CLI from:
 export HTTPS_PROXY="socks5://127.0.0.1:1081"
 
 # Download candles of BTCUSDT to CSV file (Last 30 days, timeframe 1D)
-./bin/azbot.x86_64 download --pair BTCUSDT --timeframe 1d --days 30 --output ./testdata/BTCUSDT-5m.csv
+./dist/bin/azbot download --pair BTCUSDT --timeframe 1d --days 30 --output ./testdata/BTCUSDT-5m.csv
 ```
 
 ## Backtesting Example
@@ -54,7 +54,7 @@ export HTTPS_PROXY="socks5://127.0.0.1:1081"
 Backtesting a custom strategy from [examples](examples) directory:
 
 ```sh
-go run examples/backtesting/backtesting.go
+./dist/bin/azbot backtest
 ```
 
 Output:
@@ -115,12 +115,13 @@ Chart available at http://localhost:8080
   - [x] Paper Wallet (Live Trading with fake wallet)
   - [x] Order Limit, Market, Stop Limit, OCO
   - [x] Load Feed from CSV
-  - [ ] Load Feed from TDX local files
-  - [ ] Load Feed from Redis DB
+  - [ ] Load Feed from TDX local files (new)
+  - [ ] Load Feed from Redis DB (new)
+  - [ ] optimize backtesting (new)
 
 - [x] Paperwallet
-  - [ ] Load Feed from TDX remote API
-  - [ ] Load Feed from CTP simnow and live
+  - [ ] Load Feed from TDX remote API (new)
+  - [ ] Load Feed from CTP simnow and live (new)
 
 - [x] Bot Utilities
   - [x] CLI to download historical data
@@ -135,13 +136,15 @@ Chart available at http://localhost:8080
   - [x] Ocosell
   - [x] Trailingstop
   - [x] Turtle
-  - [ ] Mean Reversion
-  - [ ] DCAOnSteroids
-  - [ ] Diamondhands
+  - [ ] Mean Reversion (new)
+  - [ ] DCAOnSteroids (new)
+  - [ ] Diamondhands (new)
+  - [ ] RL-PPO (new)
 
-- [ ] Todo
+- [ ] Others
   - [ ] Include Web UI Controller
   - [ ] Include more chart indicators
+  - [ ] Docker support
   - [ ] Docs
 
 ## New exchange

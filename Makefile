@@ -2,7 +2,7 @@ CURR_DIR := $(shell pwd)
 ARCH := $(shell uname -m)
 
 ENTRY_PORTFEL := ./azbot/cmd/azbot/*.go
-BIN_PORTFEL := ./bin/azbot
+BIN_PORTFEL := ./dist/bin/azbot
 OPT_LIB_ENV := LD_LIBRARY_PATH=`pwd`/opt/lib/${ARCH}:${LD_LIBRARY_PATH}
 
 default: all
@@ -14,15 +14,14 @@ all:
 ifeq ($(ARCH), aarch64)
 	@echo "build on aarch64"
 endif
-	@mkdir -p ./bin
-
+	@mkdir -p ./dist/bin
 	@echo "build azbot"
-	@go build -ldflags="-w -s" -o ${BIN_PORTFEL}.${ARCH} ${ENTRY_PORTFEL}
+	@go build -ldflags="-w -s" -o ${BIN_PORTFEL} ${ENTRY_PORTFEL}
 	@#CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ${BIN_PORTFEL}.x86_64 ${ENTRY_PORTFEL}
 	@#CGO_ENABLED=0 GOOS=linux GOARCH=arm64 CC=aarch64-linux-gnu-gcc CGO_LDFLAGS="-L ./opt/lib/aarch64" go build -o ${BIN_PORTFEL}.aarch64 ${ENTRY_PORTFEL}
 
 clean:
-	@rm -rf ./bin/*
+	@rm -rf ./dist/bin/*
 
 generate:
 	go generate ./...
