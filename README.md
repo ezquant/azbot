@@ -112,16 +112,16 @@ Chart available at http://localhost:8080
 ## Roadmap
 
 - [x] Backtesting
-  - [x] Paper Wallet (Live Trading with fake wallet)
   - [x] Order Limit, Market, Stop Limit, OCO
   - [x] Load Feed from CSV
   - [ ] Load Feed from TDX local files (new)
   - [ ] Load Feed from Redis DB (new)
-  - [ ] optimize backtesting (new)
 
 - [x] Paperwallet
+  - [x] Paper Wallet (Live Trading with fake wallet)
+  - [x] Load Feed from Binance
   - [ ] Load Feed from TDX remote API (new)
-  - [ ] Load Feed from CTP simnow and live (new)
+  - [ ] Load Feed from CTP broker (new)
 
 - [x] Bot Utilities
   - [x] CLI to download historical data
@@ -144,8 +144,10 @@ Chart available at http://localhost:8080
 - [ ] Others
   - [ ] Include Web UI Controller
   - [ ] Include more chart indicators
-  - [ ] Docker support
   - [ ] Docs
+  - [x] config file for strategy parameters (new)
+  - [ ] Strategy parameter optimizer (new)
+  - [ ] Docker support (new)
 
 ## New exchange
 

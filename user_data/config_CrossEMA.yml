@@ -1,0 +1,80 @@
+# Strategy Backtesting and Parameter Optimization Configuration
+
+# Backtest Parameters
+backtest:
+  timeframe: 5m
+  initial_balance: 10000
+  fee: 0.001
+  slippage: 0.001
+
+# Strategy Name
+strategy: CrossEMA
+
+# Strategy Parameters (Only the default value is used during backtesting)
+parameters:
+  # Dynamic Position Size
+  - name: dynamic_position_size
+    type: bool
+    default: false
+    min: false
+    max: true
+    step: 0
+  - name: risk_per_trade
+    type: float
+    default: 0.2
+    min: 0.2
+    max: 0.2
+    step: 0.1
+
+  # Dynamic Stop Loss
+  - name: dynamic_stop_loss
+    type: bool
+    default: false
+    min: false
+    max: true
+    step: 0
+  - name: stop_loss_multiplier
+    type: float
+    default: 2.0
+    min: 2.0
+    max: 2.0
+    step: 4.0
+
+  # Dynamic Take Profit
+  - name: dynamic_take_profit
+    type: bool
+    default: false
+    min: false
+    max: true
+    step: 0
+  - name: take_profit_multiplier
+    type: float
+    default: 2.0
+    min: 2.0
+    max: 2.0
+    step: 3.0
+
+  # Other Parameters
+  - name: ema8_period
+    type: int
+    default: 8
+    min: 3
+    max: 11
+    step: 4
+  - name: sma21_period
+    type: int
+    default: 21
+    min: 7
+    max: 25
+    step: 6
+
+# Asset Weights
+asset_weights:
+  BTCUSDT: 0.4
+  ETHUSDT: 0.2
+  XRPUSDT: 0.1
+  SOLUSDT: 0.1
+  DOGEUSDT: 0.05
+  ADAUSDT: 0.05
+  BNBUSDT: 0.05
+  UNIUSDT: 0.05

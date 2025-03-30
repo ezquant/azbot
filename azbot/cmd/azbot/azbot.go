@@ -1,15 +1,17 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
 	"github.com/ezquant/azbot/azbot/download"
 	"github.com/ezquant/azbot/azbot/exchange"
+	"github.com/ezquant/azbot/azbot/plus/models"
 	"github.com/ezquant/azbot/azbot/service"
 	"github.com/ezquant/azbot/examples/backtesting"
-
 	"github.com/urfave/cli/v2"
+	"gopkg.in/yaml.v3"
 )
 
 func main() {
@@ -111,9 +113,37 @@ func main() {
 				Name:     "backtest",
 				HelpName: "backtest",
 				Usage:    "Run backtesting for a custom strategy",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:     "config",
+						Aliases:  []string{"c"},
+						Usage:    "eg. ./user_data/config_CrossEMA.yml",
+						Required: true,
+					},
+				},
 				Action: func(c *cli.Context) error {
 					// 调用 backtesting.go 中的主逻辑
-					return backtesting.RunBacktesting()
+					// bug修复：将 c.String("config") 的返回值转换为 *string 类型
+					config, err := ReadConfig(c.String("config"))
+					if err != nil {
+						log.Fatalf("cannot read config file: %v", err)
+					}
+					databasePath := "./user_data/db"
+					sharpeRatio, chart := backtesting.Run(config, &databasePath)
+					fmt.Printf("\n策略评估指标:\n")
+					fmt.Printf("夏普率: %.2f\n", sharpeRatio)
+					fmt.Printf("夏普率解读: \n")
+					fmt.Printf("- 小于0: 策略表现差于无风险利率\n")
+					fmt.Printf("- 0-1: 策略风险调整后收益一般\n")
+					fmt.Printf("- 1-2: 策略风险调整后收益良好\n")
+					fmt.Printf("- 大于2: 策略风险调整后收益优秀\n")
+
+					// Display candlesticks chart in browser
+					err = chart.Start()
+					if err != nil {
+						log.Fatal(err)
+					}
+					return nil
 				},
 			},
 		},
@@ -123,4 +153,16 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func ReadConfig(path string) (config *models.Config, err error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	config = &models.Config{}
+	err = yaml.Unmarshal(data, config)
+
+	return
 }

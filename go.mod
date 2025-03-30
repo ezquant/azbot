@@ -7,6 +7,7 @@ require (
 	github.com/adshao/go-binance/v2 v2.4.1
 	github.com/evanw/esbuild v0.17.11
 	github.com/glebarez/sqlite v1.7.0
+	github.com/go-resty/resty/v2 v2.16.5
 	github.com/jpillora/backoff v1.0.0
 	github.com/markcheno/go-talib v0.0.0-20190307022042-cd53a9264d70
 	github.com/olekukonko/tablewriter v0.0.5
@@ -20,6 +21,7 @@ require (
 	github.com/xhit/go-str2duration/v2 v2.1.0
 	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17
 	gopkg.in/tucnak/telebot.v2 v2.5.0
+	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/gorm v1.24.6
 )
 
@@ -30,7 +32,6 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/glebarez/go-sqlite v1.20.3 // indirect
-	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
@@ -70,15 +71,16 @@ require (
 	github.com/tidwall/rtred v0.1.2 // indirect
 	github.com/tidwall/tinyqueue v0.1.1 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
-	golang.org/x/crypto v0.0.0-20220926161630-eccd6366d1be // indirect
-	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
-	golang.org/x/sys v0.6.0 // indirect
-	golang.org/x/term v0.6.0 // indirect
-	golang.org/x/text v0.3.8 // indirect
-	golang.org/x/tools v0.1.12 // indirect
+	golang.org/x/crypto v0.31.0 // indirect
+	golang.org/x/mod v0.17.0 // indirect
+	golang.org/x/net v0.33.0 // indirect
+	golang.org/x/sync v0.10.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/term v0.27.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
+	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 	modernc.org/libc v1.22.2 // indirect
 	modernc.org/mathutil v1.5.0 // indirect
 	modernc.org/memory v1.5.0 // indirect
