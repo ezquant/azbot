@@ -61,6 +61,8 @@ func Run(config *models.Config, databasePath *string) (float64, *plot.Chart) {
 	switch config.Strategy {
 	case "CrossEMA":
 		strategy, err = strategies.NewCrossEMA(config, kv)
+	case "RLPPO":
+		strategy, err = strategies.NewRLPPO(config, kv)
 	default:
 		log.Fatalf("Unknown strategy: %s", config.Strategy)
 	}

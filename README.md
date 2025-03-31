@@ -95,8 +95,9 @@ Chart available at http://localhost:8080
 ```
 
 ### Plot result
-
+<!-->
 <img width="100%"  src="https://user-images.githubusercontent.com/7620947/139601478-7b1d826c-f0f3-4766-951e-b11b1e1c9aa5.png" />
+-->
 
 ## Features
 

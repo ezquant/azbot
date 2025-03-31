@@ -1,0 +1,132 @@
+# 强化学习PPO策略配置文件
+
+# 回测参数
+backtest:
+  timeframe: 5m
+  initial_balance: 10000
+  fee: 0.001
+  slippage: 0.001
+
+# 策略名称
+strategy: RLPPO
+
+# 策略参数 (回测时使用默认值)
+parameters:
+  # 神经网络参数
+  - name: state_size
+    type: int
+    default: 16
+    min: 8
+    max: 24
+    step: 4
+  - name: hidden_size
+    type: int
+    default: 128
+    min: 64
+    max: 256
+    step: 32
+
+  # PPO算法参数
+  - name: gamma
+    type: float
+    default: 0.99
+    min: 0.95
+    max: 0.999
+    step: 0.01
+  - name: clip_epsilon
+    type: float
+    default: 0.2
+    min: 0.1
+    max: 0.3
+    step: 0.05
+  - name: entropy_coef
+    type: float
+    default: 0.01
+    min: 0.001
+    max: 0.1
+    step: 0.01
+  - name: learning_rate
+    type: float
+    default: 0.0005
+    min: 0.0001
+    max: 0.001
+    step: 0.0001
+  - name: value_coef
+    type: float
+    default: 0.5
+    min: 0.1
+    max: 1.0
+    step: 0.1
+  
+  # 批处理参数
+  - name: batch_size
+    type: int
+    default: 64
+    min: 32
+    max: 128
+    step: 16
+  - name: update_epochs
+    type: int
+    default: 3
+    min: 1
+    max: 5
+    step: 1
+
+  # 交易环境参数
+  - name: lookback_window
+    type: int
+    default: 48
+    min: 24
+    max: 96
+    step: 12
+  - name: target_sharp_ratio
+    type: float
+    default: 2.0
+    min: 1.0
+    max: 3.0
+    step: 0.5
+  
+  # 风险管理参数
+  - name: max_leverage
+    type: float
+    default: 1.0
+    min: 1.0
+    max: 5.0
+    step: 0.5
+  - name: transaction_cost
+    type: float
+    default: 0.001
+    min: 0.0001
+    max: 0.002
+    step: 0.0001
+  - name: reward_scaling
+    type: float
+    default: 10.0
+    min: 1.0
+    max: 20.0
+    step: 1.0
+  
+  # 训练控制参数
+  - name: training_mode
+    type: bool
+    default: true
+    min: false
+    max: true
+    step: 0
+  - name: update_freq
+    type: int
+    default: 60
+    min: 30
+    max: 120
+    step: 10
+
+# 资产权重
+asset_weights:
+  BTCUSDT: 0.4
+  ETHUSDT: 0.2
+  SOLUSDT: 0.1
+  BNBUSDT: 0.1
+  AVAXUSDT: 0.05
+  LINKUSDT: 0.05
+  ADAUSDT: 0.05
+  DOGEUSDT: 0.05 

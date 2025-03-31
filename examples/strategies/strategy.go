@@ -8,6 +8,7 @@ import (
 	"github.com/ezquant/azbot/azbot/strategy"
 )
 
+// Strategy 是策略接口，所有策略必须实现这个接口
 type Strategy interface {
 	Timeframe() string
 	WarmupPeriod() int
