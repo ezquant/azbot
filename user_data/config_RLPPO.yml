@@ -122,11 +122,12 @@ parameters:
 
 # 资产权重
 asset_weights:
-  BTCUSDT: 0.4
-  ETHUSDT: 0.2
+  BTCUSDT: 0.3
+  ETHUSDT: 0.3
+  XRPUSDT: 0.2
   SOLUSDT: 0.1
   BNBUSDT: 0.1
-  AVAXUSDT: 0.05
-  LINKUSDT: 0.05
-  ADAUSDT: 0.05
-  DOGEUSDT: 0.05 
+  #AVAXUSDT: 0.05
+  #LINKUSDT: 0.05
+  #ADAUSDT: 0.05
+  #DOGEUSDT: 0.05

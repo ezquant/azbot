@@ -4,17 +4,23 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+	"path"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/go-resty/resty/v2"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
 	USDSymbol       = "USDT"
 	coinNotFoundErr = "coin symbol \"%s\" not found"
 	noCoinsListErr  = "no coins list in the JSON response"
+	cacheDir        = "user_data/cache"
+	cacheFile       = "coingecko_coins.json"
+	cacheTimeFile   = "coingecko_cache_time.txt"
 )
 
 var coningeckoSlugs = map[string]string{
@@ -38,9 +44,14 @@ var coningeckoSlugs = map[string]string{
 
 var (
 	cacheMutex sync.Mutex
-	cacheData  []map[string]string
-	cacheTime  time.Time
 )
+
+func init() {
+	// 确保缓存目录存在
+	if err := os.MkdirAll(cacheDir, 0755); err != nil {
+		panic(fmt.Sprintf("创建缓存目录失败: %v", err))
+	}
+}
 
 type StrategyData struct {
 	//MinimumBalance    float64 // for DCAOnSteroids
@@ -112,8 +123,19 @@ func getSlugs(assetWeights map[string]float64) (map[string]string, error) {
 	cacheMutex.Lock()
 	defer cacheMutex.Unlock()
 
-	// 检查缓存是否过期（1分钟）
-	if time.Since(cacheTime) > time.Minute {
+	// 检查缓存是否过期
+	needUpdate := true
+	timeFilePath := path.Join(cacheDir, cacheTimeFile)
+	if timeData, err := os.ReadFile(timeFilePath); err == nil {
+		if cacheTime, err := time.Parse(time.RFC3339, string(timeData)); err == nil {
+			if time.Since(cacheTime) <= time.Minute*5 {
+				needUpdate = false
+			}
+		}
+		log.Info("需要更新 coins list 缓存: ", needUpdate, "，上次更新时间: ", string(timeData))
+	}
+
+	if needUpdate {
 		resp, err := resty.New().R().
 			Get("https://api.coingecko.com/api/v3/coins/list")
 		if err != nil {
@@ -128,30 +150,60 @@ func getSlugs(assetWeights map[string]float64) (map[string]string, error) {
 		}
 
 		// 更新缓存
-		cacheData = jsonResp
-		cacheTime = time.Now()
+		cacheData, err := json.Marshal(jsonResp)
+		if err != nil {
+			return nil, err
+		}
+
+		// 保存缓存数据
+		cacheFilePath := path.Join(cacheDir, cacheFile)
+		if err := os.WriteFile(cacheFilePath, cacheData, 0644); err != nil {
+			return nil, fmt.Errorf("写入缓存文件失败: %v", err)
+		}
+
+		// 保存缓存时间
+		timeStr := time.Now().Format(time.RFC3339)
+		if err := os.WriteFile(timeFilePath, []byte(timeStr), 0644); err != nil {
+			return nil, fmt.Errorf("写入缓存时间文件失败: %v", err)
+		}
+	}
+
+	// 从缓存文件读取数据
+	var coinsData []map[string]string
+	cacheFilePath := path.Join(cacheDir, cacheFile)
+	if cacheData, err := os.ReadFile(cacheFilePath); err == nil {
+		if err := json.Unmarshal(cacheData, &coinsData); err != nil {
+			return nil, fmt.Errorf("解析缓存数据失败: %v", err)
+		}
+	} else {
+		return nil, fmt.Errorf("读取缓存文件失败: %v", err)
 	}
 
 	slugs := make(map[string]string)
-
 	for pair := range assetWeights {
 		symbol := strings.Split(pair, USDSymbol)[0]
+		found := false
 
-		if slug, ok := findSlug(symbol); ok {
+		// 首先检查预定义的映射
+		if slug, ok := coningeckoSlugs[symbol]; ok {
 			slugs[pair] = slug
-		} else {
+			found = true
+			continue
+		}
+
+		// 如果预定义映射中没有，则在API返回的数据中查找
+		for _, coin := range coinsData {
+			if coin["symbol"] == strings.ToLower(symbol) {
+				slugs[pair] = coin["id"]
+				found = true
+				break
+			}
+		}
+
+		if !found {
 			return nil, fmt.Errorf(coinNotFoundErr, symbol)
 		}
 	}
 
 	return slugs, nil
-}
-
-func findSlug(symbol string) (string, bool) {
-	for _, coin := range cacheData {
-		if coin["symbol"] == strings.ToLower(symbol) {
-			return coin["id"], true
-		}
-	}
-	return "", false
 }

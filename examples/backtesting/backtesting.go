@@ -22,14 +22,20 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// RunBacktesting runs the backtesting logic
-
 const initialBalance = 10000.0 // 设置初始资金总额
 
 // 用于在goroutine间传递结果的结构体
 type summaryResult struct {
 	sharpeRatio float64
 	err         error
+}
+
+// OutputResult 保存解析后的回测数据
+type OutputResult struct {
+	StartPortfolio float64
+	FinalPortfolio float64
+	MaxDrawdown    float64
+	RawOutput      string
 }
 
 // Run executes the backtesting process with the given configuration and database path.
@@ -120,99 +126,30 @@ func Run(config *models.Config, databasePath *string) (float64, *plot.Chart) {
 	kv.RemoveDB()
 
 	// 重定向错误输出到空设备（关闭回测进度条）
-	//oldStderr := os.Stderr
-	//devNull, err := os.OpenFile(os.DevNull, os.O_WRONLY, 0)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//os.Stderr = devNull
-
-	// 运行回测
-	if err := bot.Run(ctx); err != nil {
+	if err := runWithProgress(false, func() error {
+		return bot.Run(ctx)
+	}); err != nil {
 		return 0, chart
 	}
 
-	// 恢复错误输出
-	//os.Stderr = oldStderr
-
-	// 创建管道用于捕获输出
-	r, w, err := os.Pipe()
+	outputResult, err := captureOutput(func() {
+		bot.Summary()
+	})
 	if err != nil {
 		return 0, chart
 	}
 
-	// 保存原始的标准输出
-	oldStdout := os.Stdout
-	os.Stdout = w
-
-	// 创建一个通道用于同步
-	done := make(chan string)
-
-	// 启动 goroutine 读取输出
-	go func() {
-		var output strings.Builder
-		reader := bufio.NewReader(r)
-		for {
-			line, err := reader.ReadString('\n')
-			if err != nil {
-				if err != io.EOF {
-					log.Printf("读取输出时发生错误: %v", err)
-				}
-				break
-			}
-			output.WriteString(line)
-		}
-		done <- output.String()
-	}()
-
-	bot.Summary()
-
-	// 恢复标准输出并关闭写入端
-	os.Stdout = oldStdout
-	w.Close()
-
-	// 等待读取完成并获取输出
-	output := <-done
-	r.Close()
-	//println("--> output", output)
-
-	// 使用正则表达式解析结果
-	startPortfolioRe := regexp.MustCompile(`START PORTFOLIO\s*=\s*([\d.]+)`)
-	finalPortfolioRe := regexp.MustCompile(`FINAL PORTFOLIO\s*=\s*([\d.]+)`)
-	maxDrawdownRe := regexp.MustCompile(`MAX DRAWDOWN = (-[\d.]+)`)
-
-	matches := startPortfolioRe.FindStringSubmatch(output)
-	if matches == nil {
-		log.Println("无法解析起始资金数据")
-		return 0, chart
-	}
-	startPortfolio, _ := strconv.ParseFloat(matches[1], 64)
-
-	matches = finalPortfolioRe.FindStringSubmatch(output)
-	if matches == nil {
-		log.Println("无法解析最终资金数据")
-		return 0, chart
-	}
-	finalPortfolio, _ := strconv.ParseFloat(matches[1], 64)
-
-	matches = maxDrawdownRe.FindStringSubmatch(output)
-	if matches == nil {
-		log.Println("无法解析最大回撤数据")
-		return 0, chart
-	}
-	maxDrawdown, _ := strconv.ParseFloat(matches[1], 64)
-
 	// 计算夏普率
 	riskFreeRate := 0.02
-	returns := (finalPortfolio - startPortfolio) / startPortfolio
-	volatility := math.Abs(maxDrawdown / 100.0)
+	returns := (outputResult.FinalPortfolio - outputResult.StartPortfolio) / outputResult.StartPortfolio
+	volatility := math.Abs(outputResult.MaxDrawdown / 100.0)
 	if volatility == 0 {
 		volatility = 0.0001 // 避免除以零
 	}
 	sharpeRatio := (returns - riskFreeRate) / volatility
 
 	// 打印原始输出
-	fmt.Print(output)
+	fmt.Print(outputResult.RawOutput)
 
 	var printDetails bool = false
 	if printDetails {
@@ -243,4 +180,104 @@ func Run(config *models.Config, databasePath *string) (float64, *plot.Chart) {
 	}
 
 	return sharpeRatio, chart
+}
+
+// runWithProgress 临时重定向标准错误输出
+// 接受一个函数作为参数，在重定向后执行该函数，然后恢复原有输出
+func runWithProgress(withProgress bool, fn func() error) error {
+	if withProgress {
+		return fn()
+	}
+
+	// 保存原始的错误输出
+	oldStderr := os.Stderr
+
+	// 重定向到空设备
+	devNull, err := os.OpenFile(os.DevNull, os.O_WRONLY, 0)
+	if err != nil {
+		return err
+	}
+	os.Stderr = devNull
+
+	// 执行函数
+	err = fn()
+
+	// 恢复错误输出
+	os.Stderr = oldStderr
+
+	return err
+}
+
+// captureOutput 捕获并解析函数执行过程中的标准输出
+// fn 是需要捕获输出的函数
+// 返回解析后的输出结果和可能的错误
+func captureOutput(fn func()) (*OutputResult, error) {
+	// 创建管道用于捕获输出
+	r, w, err := os.Pipe()
+	if err != nil {
+		return nil, err
+	}
+
+	// 保存原始的标准输出
+	oldStdout := os.Stdout
+	os.Stdout = w
+
+	// 创建一个通道用于同步
+	done := make(chan string)
+
+	// 启动 goroutine 读取输出
+	go func() {
+		var output strings.Builder
+		reader := bufio.NewReader(r)
+		for {
+			line, err := reader.ReadString('\n')
+			if err != nil {
+				if err != io.EOF {
+					log.Printf("读取输出时发生错误: %v", err)
+				}
+				break
+			}
+			output.WriteString(line)
+		}
+		done <- output.String()
+	}()
+
+	// 执行需要捕获输出的函数
+	fn()
+
+	// 恢复标准输出并关闭写入端
+	os.Stdout = oldStdout
+	w.Close()
+
+	// 等待读取完成并获取输出
+	output := <-done
+	r.Close()
+
+	// 解析输出
+	result := &OutputResult{RawOutput: output}
+
+	// 使用正则表达式解析结果
+	startPortfolioRe := regexp.MustCompile(`START PORTFOLIO\s*=\s*([\d.]+)`)
+	finalPortfolioRe := regexp.MustCompile(`FINAL PORTFOLIO\s*=\s*([\d.]+)`)
+	maxDrawdownRe := regexp.MustCompile(`MAX DRAWDOWN = (-[\d.]+)`)
+
+	matches := startPortfolioRe.FindStringSubmatch(output)
+	if matches == nil {
+		return nil, fmt.Errorf("无法解析起始资金数据")
+	}
+	result.StartPortfolio, _ = strconv.ParseFloat(matches[1], 64)
+
+	matches = finalPortfolioRe.FindStringSubmatch(output)
+	if matches == nil {
+		return nil, fmt.Errorf("无法解析最终资金数据")
+	}
+	result.FinalPortfolio, _ = strconv.ParseFloat(matches[1], 64)
+
+	matches = maxDrawdownRe.FindStringSubmatch(output)
+	if matches == nil {
+		return nil, fmt.Errorf("无法解析最大回撤数据")
+	}
+	result.MaxDrawdown, _ = strconv.ParseFloat(matches[1], 64)
+
+	return result, nil
 }
